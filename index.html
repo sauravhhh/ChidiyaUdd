@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#F7F0DC">
+<title>Chidiya Udd — Party Game</title>
+<meta name="description" content="Your favourite 90s game is back. Put your fingers on the screen, listen to the callouts, lift ONLY when it flies!">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--cream:#F7F0DC;--cream2:#F1E6CB;--brown:#6B4226;--brown2:#8B5A2B;--orange:#F97316;--orange2:#EA580C;--green:#D9F2D0;--red:#DC2626;--ink:#3B2A1E}
+html,body{height:100%}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--cream);color:var(--brown);-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;overflow-x:hidden}
+.view{display:none;min-height:100dvh;flex-direction:column;align-items:center;padding:24px 20px 40px;text-align:center}
+.view.on{display:flex}
+.bird{width:150px;height:150px}
+.bird.small{width:110px;height:110px}
+h1{font-size:clamp(40px,11vw,64px);font-weight:900;letter-spacing:-1px;line-height:1.05}
+h1 .u{color:var(--orange2)}
+.tag{font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--brown2);margin-top:10px}
+.sub{font-size:17px;line-height:1.5;color:var(--ink);max-width:340px;margin-top:14px}
+.btn{background:var(--orange);color:#fff;border:none;border-radius:999px;padding:16px 44px;font-size:20px;font-weight:800;cursor:pointer;box-shadow:0 4px 0 var(--orange2);margin-top:28px}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--orange2)}
+.btn.ghost{background:transparent;color:var(--brown);border:2px solid var(--brown);box-shadow:none;padding:12px 28px;font-size:16px;margin-top:14px}
+.howto{margin-top:30px;text-align:left;background:var(--cream2);border:2px solid var(--brown);border-radius:18px;padding:18px 20px;max-width:360px}
+.howto h3{font-size:17px;margin-bottom:8px}
+.howto ol{margin-left:20px;font-size:15px;line-height:1.7;color:var(--ink)}
+.countrow{display:flex;gap:12px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+.countbtn{width:64px;height:64px;border-radius:50%;border:3px solid var(--brown);background:#fff;color:var(--brown);font-size:26px;font-weight:900;cursor:pointer}
+.countbtn.sel{background:var(--brown);color:#fff}
+.toggle{margin-top:22px;font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px;cursor:pointer}
+.toggle .sw{width:52px;height:30px;border-radius:999px;background:#C9BFA5;position:relative;transition:.2s;flex:none}
+.toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
+.toggle.on .sw{background:var(--orange)}
+.toggle.on .sw::after{left:25px}
+.status{font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--brown2)}
+.callout{min-height:clamp(90px,22vw,150px);display:flex;align-items:center;justify-content:center;margin-top:18px}
+.callout .word{font-size:clamp(46px,14vw,92px);font-weight:900;line-height:1;letter-spacing:-1px}
+.callout .word.small{font-size:clamp(30px,9vw,56px)}
+.hint{font-size:16px;color:var(--ink);margin-top:6px;min-height:24px}
+.barwrap{width:min(320px,80vw);height:8px;background:#E3D6B4;border-radius:999px;margin:16px auto 0;overflow:hidden}
+.bar{height:100%;background:var(--orange);width:100%}
+.circles{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:26px;touch-action:none}
+.circle{width:clamp(76px,22vw,118px);height:clamp(76px,22vw,118px);border-radius:50%;border:4px solid var(--brown);background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;color:var(--brown);touch-action:none;cursor:pointer;transition:background .12s,color .12s,transform .12s}
+.circle.down{background:var(--brown);color:#fff;transform:scale(1.06)}
+.circle.out{background:#E8E0CC;color:var(--red);border-color:#C9BFA5;text-decoration:line-through}
+.circle.lifted{border-style:dashed;opacity:.75}
+.result{font-size:19px;font-weight:800;line-height:1.4;min-height:56px;margin-top:14px;max-width:360px}
+.result .bad{color:var(--red)}
+.result .good{color:#15803D}
+.win{background:var(--green)}
+.win h1{font-size:clamp(34px,9vw,52px)}
+.win .who{font-size:clamp(44px,13vw,72px);font-weight:900;color:var(--brown);margin-top:8px}
+.win .fun{font-size:17px;font-weight:800;line-height:1.5;color:var(--ink);background:#fff;border:2px solid var(--brown);border-radius:14px;padding:14px 18px;margin-top:22px;max-width:360px}
+.note{font-size:12px;color:var(--brown2);margin-top:auto;padding-top:30px}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="view on" id="view-home">
+<svg class="bird" viewBox="0 0 120 120" aria-label="Chidiya bird">
+<path d="M60 20 Q54 8 48 6 M60 20 Q60 6 60 4 M60 20 Q66 8 72 6" stroke="#6B4226" stroke-width="4" fill="none" stroke-linecap="round"/>
+<ellipse cx="60" cy="70" rx="42" ry="40" fill="#8B5A2B"/>
+<ellipse cx="60" cy="84" rx="28" ry="22" fill="#D9A066"/>
+<circle cx="44" cy="58" r="14" fill="#fff"/><circle cx="76" cy="58" r="14" fill="#fff"/>
+<circle cx="46" cy="60" r="6" fill="#222"/><circle cx="74" cy="60" r="6" fill="#222"/>
+<path d="M60 70 L50 79 L70 79 Z" fill="#F97316"/>
+<path d="M22 70 Q36 84 30 98 Q19 88 22 70" fill="#6B4226"/>
+</svg>
+<h1>Chidiya<br><span class="u">Udd</span></h1>
+<div class="tag">Your favourite 90s game</div>
+<p class="sub">It flies, you lift! The phone calls it. You react. Gather around one phone, put your fingers on the screen, and be the last one standing.</p>
+<button class="btn" onclick="showView('setup')">Play</button>
+<div class="howto">
+<h3>How to play</h3>
+<ol>
+<li>Each player puts one finger on a circle.</li>
+<li>Listen to the callout — or read it.</li>
+<li>Lift your finger ONLY when it flies!</li>
+<li>Wrong lift, or no lift on a flyer — you're out.</li>
+<li>Last one standing wins!</li>
+</ol>
+</div>
+<div class="note">No accounts. No ads. Just pure gameplay.</div>
+</div>
+
+<!-- SETUP -->
+<div class="view" id="view-setup">
+<h1 style="font-size:clamp(32px,9vw,48px)">How many<br>players?</h1>
+<div class="countrow" id="countRow">
+<button class="countbtn" data-n="2" onclick="pickCount(2)">2</button>
+<button class="countbtn" data-n="3" onclick="pickCount(3)">3</button>
+<button class="countbtn sel" data-n="4" onclick="pickCount(4)">4</button>
+<button class="countbtn" data-n="5" onclick="pickCount(5)">5</button>
+</div>
+<div class="toggle on" id="voiceToggle" onclick="toggleVoice()"><span class="sw"></span> Voice callouts</div>
+<p class="sub">Each player: one finger on one circle.<br>On a computer, hold keys 1–5 instead of fingers.</p>
+<button class="btn" onclick="startGame()">Start game</button>
+<button class="btn ghost" onclick="showView('home')">Back</button>
+</div>
+
+<!-- GAME -->
+<div class="view" id="view-game">
+<div class="status" id="gameStatus">Place your fingers on the circles</div>
+<div class="callout"><div class="word" id="calloutWord">Get ready…</div></div>
+<div class="hint" id="gameHint">All fingers down to start</div>
+<div class="barwrap"><div class="bar" id="reactBar" style="width:0%"></div></div>
+<div class="circles" id="circles"></div>
+<div class="result" id="gameResult"></div>
+<button class="btn ghost" id="quitBtn" onclick="quitToHome()">Quit</button>
+</div>
+
+<!-- WIN / DRAW -->
+<div class="view win" id="view-win">
+<svg class="bird small" viewBox="0 0 120 120" aria-label="Chidiya bird">
+<path d="M60 20 Q54 8 48 6 M60 20 Q60 6 60 4 M60 20 Q66 8 72 6" stroke="#6B4226" stroke-width="4" fill="none" stroke-linecap="round"/>
+<ellipse cx="60" cy="70" rx="42" ry="40" fill="#8B5A2B"/>
+<ellipse cx="60" cy="84" rx="28" ry="22" fill="#D9A066"/>
+<circle cx="44" cy="58" r="14" fill="#fff"/><circle cx="76" cy="58" r="14" fill="#fff"/>
+<circle cx="46" cy="60" r="6" fill="#222"/><circle cx="74" cy="60" r="6" fill="#222"/>
+<path d="M60 70 L50 79 L70 79 Z" fill="#F97316"/>
+<path d="M22 70 Q36 84 30 98 Q19 88 22 70" fill="#6B4226"/>
+</svg>
+<h1 id="winTitle">Winner!</h1>
+<div class="who" id="winWho">Player 1</div>
+<div class="fun" id="winFun">Dekh raha hai Binod. Kaise sirf ek hi jeet paya!</div>
+<button class="btn" onclick="showView('setup')">Play again</button>
+<button class="btn ghost" onclick="showView('home')">Home</button>
+</div>
+
+<script>
+var CALLOUTS = [
+["Chidiya",true],["Tota",true],["Kabutar",true],["Kauwa",true],["Ullu",true],
+["Titli",true],["Aeroplane",true],["Helicopter",true],["Patang",true],["Machhar",true],
+["Makkhi",true],["Chamgadad",true],["Mor",true],["Superman",true],["Iron Man",true],
+["Haathi",false],["Kutta",false],["Billi",false],["Bandar",false],["Sher",false],
+["Gaay",false],["Machhli",false],["Saamp",false],["Chooha",false],["Cycle",false],
+["Car",false],["Train",false],["Kursi",false],["Kitab",false],["Ped",false],
+["Pahad",false],["Batman",false],["Ghar",false],["Baarish",false],["Suraj",false],
+["Binod",false],["Uthana mat!",false]
+];
+var WIN_LINES = [
+"Dekh raha hai Binod. Kaise sirf ek hi jeet paya!",
+"Udd mat bhai!",
+"Ek hi jeet paya! Baaki sab reh gaye!",
+"Chidiya udd gayi, baaki sab reh gaye!"
+];
+var REACT_MS = 2000;
+var playerCount = 4;
+var voiceOn = true;
+var players = [];
+var phase = "idle"; // waiting | countdown | callout | result | over
+var round = 0;
+var current = null;
+var lastWords = [];
+var timers = [];
+var barTimer = null;
+
+function showView(name){
+  clearTimers();
+  document.querySelectorAll(".view").forEach(function(v){ v.classList.remove("on"); });
+  document.getElementById("view-"+name).classList.add("on");
+  if(name==="home"){ phase = "idle"; }
+}
+function clearTimers(){ timers.forEach(clearTimeout); timers = []; if(barTimer){ clearInterval(barTimer); barTimer = null; } try{ speechSynthesis.cancel(); }catch(e){} }
+function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+function pickCount(n){
+  playerCount = n;
+  document.querySelectorAll(".countbtn").forEach(function(b){ b.classList.toggle("sel", parseInt(b.dataset.n,10)===n); });
+}
+function toggleVoice(){
+  voiceOn = !voiceOn;
+  document.getElementById("voiceToggle").classList.toggle("on", voiceOn);
+}
+function speak(text){
+  if(!voiceOn) return;
+  try{
+    if(!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-IN"; u.rate = 0.95; u.pitch = 1;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+function startGame(){
+  players = [];
+  for(var i=0;i<playerCount;i++) players.push({n:i+1, alive:true, down:false, lifted:false});
+  round = 0; current = null; lastWords = [];
+  buildCircles();
+  setStatus("Place your fingers on the circles");
+  setWord("Get ready…", false);
+  setHint("All fingers down to start");
+  setResult("");
+  setBar(0);
+  phase = "waiting";
+  showView("game");
+}
+function quitToHome(){ showView("home"); }
+
+function buildCircles(){
+  var box = document.getElementById("circles");
+  box.innerHTML = "";
+  players.forEach(function(p){
+    var d = document.createElement("div");
+    d.className = "circle"; d.id = "c"+p.n; d.textContent = p.n;
+    d.addEventListener("touchstart", function(e){ e.preventDefault(); fingerDown(p.n, true); }, {passive:false});
+    d.addEventListener("touchend", function(e){ e.preventDefault(); fingerDown(p.n, false); }, {passive:false});
+    d.addEventListener("touchcancel", function(){ fingerDown(p.n, false); });
+    d.addEventListener("mousedown", function(e){ e.preventDefault(); fingerDown(p.n, true); });
+    d.addEventListener("mouseup", function(){ fingerDown(p.n, false); });
+    d.addEventListener("mouseleave", function(){ if(p.down) fingerDown(p.n, false); });
+    box.appendChild(d);
+  });
+}
+function fingerDown(n, down){
+  var p = players[n-1];
+  if(!p || !p.alive || phase==="over") return;
+  if(p.down === down) return;
+  p.down = down;
+  if(!down && phase==="callout"){ p.lifted = true; }
+  paintCircles();
+  if(phase==="waiting" && allDown()) startCountdown();
+  else if(phase==="countdown" && !allDown()){ clearTimers(); phase = "waiting"; setWord("Get ready…", false); setHint("Finger lifted! All fingers down to start"); setBar(0); }
+}
+function allDown(){ return players.filter(function(p){ return p.alive; }).every(function(p){ return p.down; }); }
+function aliveCount(){ return players.filter(function(p){ return p.alive; }).length; }
+function paintCircles(){
+  players.forEach(function(p){
+    var el = document.getElementById("c"+p.n);
+    if(!el) return;
+    el.classList.toggle("down", p.down && p.alive);
+    el.classList.toggle("out", !p.alive);
+    el.classList.toggle("lifted", p.alive && phase==="callout" && p.lifted && !p.down);
+    if(!p.alive) el.textContent = "✕";
+  });
+}
+function setStatus(t){ document.getElementById("gameStatus").textContent = t; }
+function setWord(t, small){
+  var w = document.getElementById("calloutWord");
+  w.textContent = t;
+  w.classList.toggle("small", !!small);
+}
+function setHint(t){ document.getElementById("gameHint").textContent = t; }
+function setResult(html){ document.getElementById("gameResult").innerHTML = html; }
+function setBar(pct){ document.getElementById("reactBar").style.width = pct + "%"; }
+
+function startCountdown(){
+  phase = "countdown";
+  setStatus("Get ready…");
+  var steps = ["3","2","1"];
+  steps.forEach(function(s, i){
+    later(function(){
+      if(phase!=="countdown") return;
+      setWord(s, false);
+      setHint("");
+      speak(s);
+    }, i*700);
+  });
+  later(function(){ if(phase==="countdown") nextRound(); }, steps.length*700);
+}
+function pickCallout(){
+  var pool = CALLOUTS.filter(function(c){ return lastWords.indexOf(c[0])===-1; });
+  if(!pool.length) pool = CALLOUTS;
+  var c = pool[Math.floor(Math.random()*pool.length)];
+  lastWords.push(c[0]); if(lastWords.length>2) lastWords.shift();
+  return {word:c[0], flies:c[1]};
+}
+function nextRound(){
+  round++;
+  current = pickCallout();
+  players.forEach(function(p){ p.lifted = false; });
+  phase = "callout";
+  setStatus("Round " + round + " · " + aliveCount() + " left");
+  setWord(current.word, current.word.length>8);
+  setHint(current.flies ? "It flies — LIFT!" : "It does NOT fly — hold still!");
+  setResult("");
+  speak(current.word + (current.flies ? " udd!" : ""));
+  var start = Date.now();
+  setBar(100);
+  barTimer = setInterval(function(){
+    var left = Math.max(0, REACT_MS - (Date.now()-start));
+    setBar(left/REACT_MS*100);
+    if(left<=0){ clearInterval(barTimer); barTimer = null; }
+  }, 50);
+  later(judge, REACT_MS);
+}
+function judge(){
+  if(phase!=="callout") return;
+  phase = "result";
+  setBar(0);
+  var out = [];
+  players.forEach(function(p){
+    if(!p.alive) return;
+    var wrong = current.flies ? !p.lifted : p.lifted;
+    if(wrong){ p.alive = false; out.push(p); }
+  });
+  paintCircles();
+  var verb = current.flies ? "flies" : "does NOT fly";
+  if(out.length){
+    setResult("<span class='bad'>" + current.word + " " + verb + "!</span><br>Player " + out.map(function(p){ return p.n; }).join(", ") + " " + (out.length>1?"are":"is") + " OUT!");
+  } else {
+    setResult("<span class='good'>" + current.word + " " + verb + " — everyone safe!</span>");
+  }
+  setWord("…", false);
+  setHint("");
+  later(function(){
+    var left = players.filter(function(p){ return p.alive; });
+    if(left.length===1){ endGame(left[0]); }
+    else if(left.length===0){ endDraw(); }
+    else { phase = "waiting"; setStatus("Round " + (round+1) + " · " + left.length + " left"); setWord("Get ready…", false); setHint("Fingers down for the next callout"); setResult(""); if(allDown()) startCountdown(); }
+  }, 1800);
+}
+function endGame(winner){
+  phase = "over";
+  document.getElementById("winTitle").textContent = "Winner!";
+  document.getElementById("winWho").textContent = "Player " + winner.n;
+  document.getElementById("winFun").textContent = WIN_LINES[Math.floor(Math.random()*WIN_LINES.length)];
+  speak("Player " + winner.n + " wins!");
+  showView("win");
+}
+function endDraw(){
+  phase = "over";
+  document.getElementById("winTitle").textContent = "Sab out!";
+  document.getElementById("winWho").textContent = "No winner";
+  document.getElementById("winFun").textContent = "Koi nahi jeeta. Phir se khelo!";
+  showView("win");
+}
+/* keyboard: hold 1-5 as fingers (desktop) */
+document.addEventListener("keydown", function(e){
+  var n = parseInt(e.key, 10);
+  if(n>=1 && n<=5 && !e.repeat) fingerDown(n, true);
+});
+document.addEventListener("keyup", function(e){
+  var n = parseInt(e.key, 10);
+  if(n>=1 && n<=5) fingerDown(n, false);
+});
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(function(){}); }
+</script>
+</body>
+</html>
